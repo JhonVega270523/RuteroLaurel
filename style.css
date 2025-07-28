@@ -1,0 +1,364 @@
+:root {
+    --primary-color: #F48FB1; /* Rosado vibrante */
+    --secondary-color: #FFEBEE; /* Rosado suave */
+    --text-color-dark: #333333;
+    --text-color-light: #666666;
+    --white: #FFFFFF;
+    --light-gray: #F8F8F8;
+    --border-color: #E0E0E0;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--secondary-color); /* Fondo rosado suave */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    color: var(--text-color-dark);
+}
+
+/* Contenedor principal de la aplicación */
+.app-container {
+    flex-grow: 1;
+    padding: 1rem !important; /* Ajusta el padding general del contenedor */
+}
+
+.row.g-0.h-100 {
+    min-height: calc(100vh - 2rem); /* Altura mínima para la fila, considerando el padding del .app-container */
+}
+
+/* Sidebar (Panel de control) */
+.sidebar {
+    height: 100%; /* Ocupa toda la altura disponible en pantallas grandes */
+    overflow-y: auto; /* Scroll si el contenido es demasiado largo */
+    padding-right: 1.5rem !important; /* Más padding a la derecha */
+}
+
+/* Contenedor del mapa */
+.map-container {
+    height: 100%; /* Ocupa toda la altura disponible en pantallas grandes */
+}
+
+#map {
+    height: 100%; /* Mapa ocupa el 100% del contenedor */
+    min-height: 400px; /* Altura mínima para el mapa en móviles */
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background-color: var(--white); /* Asegura que el fondo sea blanco */
+}
+
+/* Estilos de la tarjeta general */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    background-color: var(--white); /* Fondo blanco para las tarjetas */
+    color: var(--text-color-dark);
+}
+
+/* Títulos de la tarjeta */
+.card-title {
+    font-weight: 600;
+    color: var(--primary-color); /* Rosado vibrante para títulos */
+    margin-bottom: 1.5rem;
+}
+
+.card-subtitle {
+    color: var(--text-color-light);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Etiquetas de formulario */
+.form-label {
+    font-weight: 500;
+    color: var(--text-color-dark);
+    margin-bottom: .5rem;
+}
+
+/* SELECT de tipo de vehículo */
+.form-select {
+    border-color: var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-color-dark);
+    background-color: var(--white);
+    transition: all 0.2s ease-in-out;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(244, 143, 177, 0.25); /* Rosado con opacidad */
+}
+
+
+/* Estilos para los inputs de Mapbox Geocoder */
+.mapboxgl-ctrl-geocoder {
+    width: 100% !important;
+    max-width: none !important;
+    border-radius: 8px;
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    position: relative;
+    background-color: var(--white); /* Fondo blanco para el Geocoder */
+}
+
+.mapboxgl-ctrl-geocoder:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(244, 143, 177, 0.25); /* Rosado con opacidad */
+    border-color: var(--primary-color);
+}
+
+.mapboxgl-ctrl-geocoder--input {
+    flex-grow: 1;
+    border-radius: 8px;
+    border: none;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    height: calc(1.5em + 1.5rem + 2px);
+    font-size: 1rem;
+    color: var(--text-color-dark);
+    background-color: transparent;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mapboxgl-ctrl-geocoder--input::placeholder {
+    color: var(--text-color-light);
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-color-light);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.mapboxgl-ctrl-geocoder--button {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    z-index: 2;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.mapboxgl-ctrl-geocoder--button:hover {
+    opacity: 1;
+}
+
+.mapboxgl-ctrl-geocoder--button:before {
+    font-family: sans-serif;
+    content: "×";
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--text-color-light);
+}
+
+/* Botones */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    padding: 0.75rem 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: #E2729B; /* Tono de rosado más oscuro al hover */
+    border-color: #E2729B;
+}
+
+.btn-success {
+    background-color: #66BB6A; /* Un verde suave para acciones positivas */
+    border-color: #66BB6A;
+    color: var(--white);
+}
+
+.btn-success:hover {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.btn-danger {
+    background-color: #EF5350; /* Un rojo suave */
+    border-color: #EF5350;
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background-color: #E53935;
+    border-color: #E53935;
+}
+
+.btn-outline-secondary {
+    color: var(--text-color-light);
+    border-color: var(--border-color);
+    background-color: var(--white);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color); /* Rosado suave al hover */
+    color: var(--text-color-dark);
+    border-color: var(--primary-color);
+}
+
+/* Estilos para los inputs de paradas dinámicas */
+.waypoint-input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.waypoint-input-group .mapboxgl-ctrl-geocoder {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.remove-waypoint-btn {
+    flex-shrink: 0;
+    height: calc(1.5em + 1.5rem + 2px);
+    width: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    border: 1px solid var(--border-color); /* Borde para que se vea más como botón */
+    background-color: var(--white);
+    color: var(--text-color-light);
+}
+
+.remove-waypoint-btn:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Marcadores personalizados */
+.marker {
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid var(--white);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.marker.origin {
+    background-color: var(--primary-color); /* Rosado para el origen */
+}
+
+.marker.destination {
+    background-color: #66BB6A; /* Verde para el destino */
+}
+
+.marker[class*="waypoint"] {
+    background-color: #FFD54F; /* Amarillo suave para las paradas */
+    border-color: var(--white);
+}
+
+/* Se elimina el estilo para .marker.user-location y @keyframes pulse */
+
+/* Alternativas de ruta */
+#alternativesList .list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--white);
+    color: var(--text-color-dark);
+}
+
+#alternativesList .list-group-item:hover {
+    background-color: var(--light-gray);
+}
+
+#alternativesList .list-group-item.active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+    font-weight: 600;
+}
+
+#alternativesList .list-group-item.active:hover {
+    background-color: #E2729B;
+}
+
+/* Estilos para el resumen de ruta (routeSummaryCard) */
+#routeSummaryCard {
+    background-color: var(--secondary-color) !important; /* Fondo rosado suave para el resumen */
+    border: 1px solid var(--primary-color) !important; /* Borde rosado vibrante */
+    color: var(--text-color-dark);
+}
+
+#routeSummaryCard .card-title {
+    color: var(--primary-color); /* Título del resumen en rosado vibrante */
+}
+
+#routeSummaryCard .text-primary { /* Para el costo */
+    color: var(--primary-color) !important;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 991.98px) { /* Para pantallas más pequeñas que lg */
+    .app-container {
+        padding: 0.5rem !important; /* Menos padding en móviles */
+    }
+
+    .row.g-0.h-100 {
+        flex-direction: column; /* Coloca los paneles en columna */
+        min-height: auto; /* Deshabilita la altura mínima fija para permitir scroll */
+    }
+
+    .sidebar {
+        height: auto; /* Altura automática en móviles */
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+        margin-bottom: 1rem; /* Espacio entre el panel y el mapa */
+    }
+
+    .map-container {
+        height: 50vh; /* Mapa ocupa el 50% de la altura de la vista en móviles */
+        min-height: 300px; /* Asegura una altura mínima razonable */
+        padding-right: 0.5rem !important;
+        padding-left: 0.5rem !important;
+    }
+
+    #map {
+        height: 100%; /* El mapa ocupa el 100% de la altura de su contenedor */
+    }
+
+    .card {
+        margin-bottom: 0; /* Elimina margen inferior extra en móviles */
+    }
+}
