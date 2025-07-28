@@ -107,7 +107,7 @@ body {
     transition: all 0.3s ease-in-out;
     display: flex;
     align-items: center;
-    position: relative;
+    position: relative; /* Es crucial para que el z-index de las sugerencias funcione */
     background-color: var(--white); /* Fondo blanco para el Geocoder */
 }
 
@@ -181,6 +181,21 @@ body {
     font-size: 1.5rem;
     line-height: 1;
     color: var(--text-color-light);
+}
+
+/* **CORRECCIÓN Z-INDEX**: Asegura que los resultados del geocodificador de Mapbox estén por encima */
+.mapboxgl-ctrl-geocoder--suggestions {
+    z-index: 10000; /* Un valor muy alto para asegurar que se superponga a todo lo demás */
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 250px; /* Limita la altura de la lista desplegable */
+    overflow-y: auto; /* Añade scroll si hay muchas sugerencias */
+    position: absolute; /* Asegura que el z-index tenga efecto */
+    width: 100%; /* Asegura que la lista ocupe todo el ancho disponible */
+    top: 100%; /* Para que aparezca justo debajo del input del geocodificador */
+    left: 0;
 }
 
 /* Botones */
@@ -271,6 +286,12 @@ body {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: none; /* Elimina el borde izquierdo para que se junte con el geocodificador */
+    z-index: 1; /* Asegura que el botón no tenga un z-index alto que lo superponga */
+}
+
+/* Si el input-group está causando un contexto de apilamiento inesperado, puedes darle un z-index bajo */
+.input-group {
+    /* z-index: 1;  Si descomentas esto, asegúrate de que no afecte otros elementos */
 }
 
 
