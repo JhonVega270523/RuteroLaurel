@@ -111,6 +111,13 @@ body {
     background-color: var(--white); /* Fondo blanco para el Geocoder */
 }
 
+/* Ajuste para el Geocoder dentro de un input-group */
+.input-group .mapboxgl-ctrl-geocoder {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none; /* Elimina el borde derecho para que se junte con el botón */
+}
+
 .mapboxgl-ctrl-geocoder:focus-within {
     box-shadow: 0 0 0 0.25rem rgba(244, 143, 177, 0.25); /* Rosado con opacidad */
     border-color: var(--primary-color);
@@ -118,7 +125,7 @@ body {
 
 .mapboxgl-ctrl-geocoder--input {
     flex-grow: 1;
-    border-radius: 8px;
+    border-radius: 8px; /* Mantener bordes del input, pero se ajustarán por el input-group */
     border: none;
     padding: 0.75rem 1rem 0.75rem 3rem;
     height: calc(1.5em + 1.5rem + 2px);
@@ -195,6 +202,30 @@ body {
     border-color: #E2729B;
 }
 
+/* Nuevo estilo para el botón de iniciar ruta/rastreo */
+.btn-info {
+    background-color: #00BCD4; /* Cian de Material Design */
+    border-color: #00BCD4;
+    color: var(--white);
+}
+
+.btn-info:hover {
+    background-color: #00ACC1;
+    border-color: #00ACC1;
+}
+
+/* Nuevo estilo para el botón de limpiar */
+.btn-warning {
+    background-color: #FFC107; /* Amarillo de Bootstrap */
+    border-color: #FFC107;
+    color: #212529; /* Texto oscuro para contraste */
+}
+
+.btn-warning:hover {
+    background-color: #E0A800; /* Tono más oscuro al hover */
+    border-color: #E0A800;
+}
+
 .btn-success {
     background-color: #66BB6A; /* Un verde suave para acciones positivas */
     border-color: #66BB6A;
@@ -228,6 +259,20 @@ body {
     color: var(--text-color-dark);
     border-color: var(--primary-color);
 }
+
+/* Estilo para el contenedor del geocodificador dentro del input-group */
+.form-control-container {
+    flex-grow: 1;
+    /* Esto es importante para que el geocodificador ocupe el espacio disponible */
+}
+
+/* Estilo para el botón Laurel */
+#laurelBtn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none; /* Elimina el borde izquierdo para que se junte con el geocodificador */
+}
+
 
 /* Estilos para los inputs de paradas dinámicas */
 .waypoint-input-group {
@@ -284,7 +329,26 @@ body {
     border-color: var(--white);
 }
 
-/* Se elimina el estilo para .marker.user-location y @keyframes pulse */
+/* Marcador de ubicación actual */
+.marker.current-location {
+    background-color: #2196F3; /* Azul para la ubicación actual */
+    animation: pulse 1.5s infinite ease-in-out; /* Animación de pulsación */
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.8);
+        opacity: 0.8;
+    }
+}
 
 /* Alternativas de ruta */
 #alternativesList .list-group-item {
