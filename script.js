@@ -16,8 +16,8 @@ let currentLocationMarker = null; // Marcador para la ubicación actual del usua
 
 // Costos por kilómetro según el tipo de vehículo
 const COST_PER_KM = {
-    car: 1700,
-    motorcycle: 1200
+    car: 2000,
+    motorcycle: 1500
 };
 
 // Coordenadas de Bogotá para el centro inicial del mapa
@@ -42,7 +42,6 @@ const calculateRouteBtn = document.getElementById("calculateRouteBtn");
 const clearFieldsBtn = document.getElementById("clearFieldsBtn");
 const shareRouteBtn = document.getElementById("shareRouteBtn");
 const laurelBtn = document.getElementById("laurelBtn");
-// La referencia a startTrackingBtn se obtiene dentro de initMapbox para asegurar que el DOM esté listo
 
 // Umbral de aumento de tiempo para considerar una ruta "colapsada"
 const COLLAPSED_THRESHOLD_PERCENT = 0.25; // 25%
@@ -72,16 +71,6 @@ function initMapbox() {
     clearFieldsBtn.addEventListener("click", clearAllFields);
     shareRouteBtn.addEventListener("click", shareRouteViaWhatsApp);
     vehicleTypeSelect.addEventListener("change", calculateAndDisplayRoute);
-
-    // **CORRECCIÓN:** Obtener la referencia al botón "startTrackingBtn" aquí,
-    // dentro de la función que se ejecuta cuando el DOM ya está cargado.
-    const startTrackingBtn = document.getElementById("startTrackingBtn"); 
-    if (startTrackingBtn) { 
-        startTrackingBtn.addEventListener("click", toggleTracking);
-    } else {
-        // Esto solo debería ocurrir si el ID del botón en el HTML está mal
-        console.error("Error: El botón 'startTrackingBtn' no se encontró en el DOM. Asegúrate de que el ID es correcto.");
-    }
 }
 
 /**
@@ -649,117 +638,6 @@ function clearAllFields() {
 }
 
 /**
- * Comparte la ruta y sus detalles por WhatsApp.
- */
-function shareRouteViaWhatsApp() {
-    // Es crucial obtener el place_name del último resultado para tener la dirección completa
-    const originAddress = geocoders.origin.lastSelectedResult ? geocoders.origin.lastSelectedResult.place_name : null;
-    const destinationAddress = geocoders.destination.lastSelectedResult ? geocoders.destination.lastSelectedResult.place_name : null;
-
-    if (!originAddress || !selectedLocations.origin) {
-        alert('Por favor, ingresa un Origen válido para compartir la ruta.');
-        return;
-    }
-    if (!destinationAddress || !selectedLocations.destination) {
-        alert('Por favor, ingresa un Destino válido para compartir la ruta.');
-        return;
-    }
-
-    // Construir la URL de Google Maps para la ruta
-    // Formato de Google Maps para múltiples paradas: /dir/Origen/Parada1/Parada2/Destino
-    let googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(originAddress)}`;
-
-    const waypointAddresses = [];
-    // Ordenar los waypoints por su índice para la URL
-    const waypointKeys = Object.keys(geocoders)
-        .filter(key => key.startsWith('waypoint'))
-        .sort((a, b) => {
-            const indexA = parseInt(a.replace('waypoint', ''));
-            const indexB = parseInt(b.replace('waypoint', ''));
-            return indexA - indexB;
-        });
-
-    waypointKeys.forEach(key => {
-        const geocoder = geocoders[key];
-        // Asegurarse de que el geocoder exista y tenga un resultado seleccionado
-        if (geocoder && geocoder.lastSelectedResult) {
-            waypointAddresses.push(encodeURIComponent(geocoder.lastSelectedResult.place_name));
-        }
-    });
-
-    if (waypointAddresses.length > 0) {
-        googleMapsUrl += `/${waypointAddresses.join('/')}`;
-    }
-
-    googleMapsUrl += `/${encodeURIComponent(destinationAddress)}`;
-    googleMapsUrl += `?travelmode=driving`; // Modo de viaje en carro
-
-    // Obtener la información de la ruta calculada (tiempo, distancia, costo)
-    const routeTimeText = routeTimeSpan.textContent;
-    const routeDistanceText = routeDistanceSpan.textContent;
-    const routeCostText = routeCostSpan.textContent;
-
-    // Construir el mensaje para WhatsApp
-    let message = `¡Hola! Aquí tienes la información de tu ruta:\n\n`;
-    message += `📍 Origen: ${originAddress}\n`;
-
-    if (waypointAddresses.length > 0) {
-        waypointAddresses.forEach((wp, index) => {
-            message += `➡️ Parada ${index + 1}: ${decodeURIComponent(wp)}\n`;
-        });
-    }
-
-    message += `🏁 Destino: ${destinationAddress}\n\n`;
-    message += `Tiempo estimado: ${routeTimeText}\n`;
-    message += `Distancia: ${routeDistanceText}\n`;
-    message += `Costo estimado: ${routeCostText}\n\n`;
-    message += `Ver en Google Maps: ${googleMapsUrl}`;
-
-    // Codificar el mensaje para la URL de WhatsApp
-    const whatsappMessage = encodeURIComponent(message);
-
-    // Solicitar al usuario el número de contacto
-    const phoneNumber = prompt("Ingresa el número de WhatsApp (incluye el código de país, ej: 57310XXXXXXX):");
-
-    if (phoneNumber) {
-        // Abrir WhatsApp con el mensaje pre-rellenado
-        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${whatsappMessage}`;
-        window.open(whatsappUrl, '_blank');
-    } else {
-        alert("Número de teléfono no ingresado. La ruta no se compartió por WhatsApp.");
-    }
-}
-
-// --- NUEVAS FUNCIONES PARA RASTREO EN TIEMPO REAL ---
-
-/**
- * Actualiza la posición del marcador de la ubicación actual del usuario en el mapa.
- * @param {Array<number>} coords - Las coordenadas [lng, lat] de la ubicación actual.
- */
-function updateCurrentLocationMarker(coords) {
-    if (currentLocationMarker) {
-        currentLocationMarker.setLngLat(coords);
-    } else {
-        const el = document.createElement('div');
-        el.className = 'marker current-location'; // Clase CSS para el marcador de ubicación actual
-
-        currentLocationMarker = new mapboxgl.Marker(el)
-            .setLngLat(coords)
-            .addTo(map);
-    }
-    // Centrar el mapa en la ubicación actual del usuario
-    // Se usa flyTo para una animación suave, con un 'speed' y 'curve' para control.
-    // El 'offset' puede ser útil si el sidebar ocupa mucho espacio y quieres centrar la vista en el mapa.
-    map.flyTo({ 
-        center: coords, 
-        speed: 0.8, // Velocidad de la animación
-        curve: 1, // Curva de la animación
-        easing: (t) => t, // Función de suavizado
-        // offset: [window.innerWidth > 991.98 ? 200 : 0, 0] // Desplaza a la derecha si es desktop para el sidebar
-    });
-}
-
-/**
  * Función de éxito que se llama cuando se obtiene la geolocalización.
  * @param {GeolocationPosition} position - Objeto de posición que contiene las coordenadas.
  */
@@ -768,98 +646,6 @@ function onGeolocationSuccess(position) {
     const coords = [longitude, latitude];
     console.log("Ubicación actual:", coords);
     updateCurrentLocationMarker(coords);
-}
-
-/**
- * Función de error que se llama si no se puede obtener la geolocalización.
- * @param {GeolocationPositionError} error - Objeto de error de geolocalización.
- */
-function onGeolocationError(error) {
-    console.error("Error al obtener la ubicación:", error);
-    let errorMessage = "No se pudo obtener la ubicación.";
-    switch (error.code) {
-        case error.PERMISSION_DENIED:
-            errorMessage += " Permiso denegado. Por favor, habilita los permisos de ubicación en tu navegador.";
-            break;
-        case error.POSITION_UNAVAILABLE:
-            errorMessage += " Información de ubicación no disponible.";
-            break;
-        case error.TIMEOUT:
-            errorMessage += " La solicitud para obtener la ubicación ha caducado.";
-            break;
-        default:
-            errorMessage += " Error desconocido.";
-            break;
-    }
-    alert(errorMessage + " No se iniciará el rastreo.");
-    // Asegurarse de que el botón refleje el estado de inactividad
-    const startTrackingBtn = document.getElementById("startTrackingBtn");
-    if (startTrackingBtn) {
-        startTrackingBtn.textContent = 'Iniciar Ruta y Rastreo';
-        startTrackingBtn.classList.remove('btn-danger'); // Si estaba rojo, quitarlo
-        startTrackingBtn.classList.add('btn-info'); // Volver al color original
-    }
-    watchId = null; // Reiniciar el watchId si hubo un error irrecuperable
-}
-
-/**
- * Inicia el rastreo de la ubicación del usuario en tiempo real.
- */
-function startTracking() {
-    if ("geolocation" in navigator) {
-        // Opciones para el rastreo (mayor precisión, timeouts)
-        const options = {
-            enableHighAccuracy: true, // Intentar usar los métodos más precisos (GPS)
-            timeout: 10000, // Tiempo máximo para obtener una ubicación (10 segundos)
-            maximumAge: 0 // No usar caché de ubicaciones antiguas, siempre una nueva
-        };
-        // watchPosition monitorea y notifica cambios de posición
-        watchId = navigator.geolocation.watchPosition(onGeolocationSuccess, onGeolocationError, options);
-        
-        const startTrackingBtn = document.getElementById("startTrackingBtn");
-        if (startTrackingBtn) {
-            startTrackingBtn.textContent = 'Detener Rastreo';
-            startTrackingBtn.classList.remove('btn-info');
-            startTrackingBtn.classList.add('btn-danger'); // Cambiar a rojo para indicar "detener"
-        }
-        alert("Rastreo de ubicación iniciado. Tu posición se mostrará en el mapa.");
-        console.log("Rastreo de ubicación iniciado con watchId:", watchId);
-    } else {
-        alert("Tu navegador no soporta la API de Geolocalización. No es posible rastrear la ubicación.");
-    }
-}
-
-/**
- * Detiene el rastreo de la ubicación del usuario.
- */
-function stopTracking() {
-    if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId); // Detener el monitoreo
-        watchId = null; // Reiniciar el ID
-        if (currentLocationMarker) {
-            currentLocationMarker.remove(); // Eliminar el marcador de la ubicación actual
-            currentLocationMarker = null;
-        }
-        const startTrackingBtn = document.getElementById("startTrackingBtn");
-        if (startTrackingBtn) {
-            startTrackingBtn.textContent = 'Iniciar Ruta y Rastreo';
-            startTrackingBtn.classList.remove('btn-danger');
-            startTrackingBtn.classList.add('btn-info'); // Volver al color original
-        }
-        alert("Rastreo de ubicación detenido.");
-        console.log("Rastreo de ubicación detenido.");
-    }
-}
-
-/**
- * Alterna entre iniciar y detener el rastreo de la ubicación.
- */
-function toggleTracking() {
-    if (watchId === null) {
-        startTracking();
-    } else {
-        stopTracking();
-    }
 }
 
 // Asegurarse de que el DOM esté completamente cargado antes de inicializar el mapa
